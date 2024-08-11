@@ -181,8 +181,11 @@ def run_backend(df):
         dfr = pd.concat([dfr, df], ignore_index=True)
 
     output_file_stream = create_xl_file([df_all, dfr], sheet_names= ['Input', 'Output'])
-    print('\n'*3)
-    print(dfr)
+    try:
+        print('\n'*3)
+        print(dfr)
+    except:
+        pass
 
     # Abnormal hours (e.g. someone working 23 hours)
     df_abnormal = dfr[~dfr['HOURS'].between(2, 11)]
