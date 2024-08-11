@@ -2,28 +2,32 @@
 # ATTENDANCE APPLICATION
 # SHADY555@GMAIL.COM
 # AUGUST2024
+# 
+# KEY NOTES FOR WEB DEPLOYMENT:
+# EVERY EXCEPT / PASS COMMAND IS TP ALLOW THE APP TO WORK ON BOTH WINDOWS AND WEB
+# CASE DOESN'T MATTER ON WINDOWS BUT IT MATTERS ON WEB. MAKE SURE FILE NAMES ARE
+# HAVING A CONSISTENT CASE (PREFERABLY LOWERCASE)
+# REQUIRMENTS.TXT IS A MUST FOR WEB DEPLOYMENT. 
 #####################################################################################
 
 
 #####################################################################################
-# BACKEND CALCULATION
+# BACKEND WORK
 #####################################################################################
-
-
-#import os
-#import subprocess
 
 
 import pandas as pd
 import time 
-#import win32com.client
+
 pd.set_option('display.max_rows', None, 'display.max_columns', None, 'display.max_colwidth', None)
 pd.set_option('display.precision', 2)
 pd.options.display.width = 0
 
 
 
-def create_xl_file(df_or_dfs, output_file='Output.xlsx', open_file=False, sheet_names=None):
+
+
+def create_xl_file(df_or_dfs, output_file='Output.xlsx', open_file=False, sheet_names=None): # CREATES A NICELY FORMATTED EXCEL FILE    
     import pandas as pd
     from openpyxl import Workbook
     from openpyxl import load_workbook
@@ -32,7 +36,10 @@ def create_xl_file(df_or_dfs, output_file='Output.xlsx', open_file=False, sheet_
     from openpyxl.worksheet.table import Table, TableStyleInfo
     from io import BytesIO
     import os
-    #import win32com.client
+    try:
+        import win32com.client
+    except:
+        pass
 
     # If df_or_dfs is not a list, convert it to a list with a single item
     if not isinstance(df_or_dfs, list):
@@ -84,7 +91,7 @@ def create_xl_file(df_or_dfs, output_file='Output.xlsx', open_file=False, sheet_
                 ws.column_dimensions[new_column_letter].width = new_column_length*1.23
             
 
-    # Save the workbook as an Excel file
+    # Save the workbook as an Excel file (IF ON WINDOWS. ON WEB IT WILL CAUSE AN ERROR)
     try:
         wb.save(output_file)
     except:
@@ -109,7 +116,7 @@ def create_xl_file(df_or_dfs, output_file='Output.xlsx', open_file=False, sheet_
 
 
 
-def delete_irrelivant_entries(df):
+def delete_irrelivant_entries(df): #DELTES ANY ALMOST DUPLICATE TIMESTAMPS E.G. 9:00 AM AND 9:03 AM
 
     # Initialize an empty list to store the indices to keep
     indices_to_keep = [0]  # Always keep the first row
@@ -123,7 +130,12 @@ def delete_irrelivant_entries(df):
     df = df.iloc[indices_to_keep].reset_index(drop=True)
     return df
 
-def merge_ins_outs(df):
+
+
+
+
+
+def merge_ins_outs(df): # MERGES CHECK IN AND CHECK OUT RESULTS IN THE SAME ROW SO IT'S EASIER TO READ
     df_ins = df.iloc[::2].reset_index(drop=True)  # odd index
     df_outs  = df.iloc[1::2].reset_index(drop=True)  # even index
     if len(df_ins) != len(df_outs): raise
@@ -133,7 +145,11 @@ def merge_ins_outs(df):
     df.loc[:, ['state_out', 'date_time_out']] = df_outs[['state', 'date_time']].values
     return df
 
-def calc_time_spent(df):
+
+
+
+
+def calc_time_spent(df): # CALCULATES THE TIME DIFFERENCE BETWEEN CHECK IN AND CHECK OUT
     df = df.copy(deep=True) # To avoid copy warning
     df['time_spent'] = df['date_time_out'] - df['date_time_in']
     df['hours'] = df['time_spent'].dt.total_seconds() / 3600
@@ -148,12 +164,13 @@ def calc_time_spent(df):
     df.insert(3, 'work day', df['date_time_in'])
     df['work day'] = pd.to_datetime(df['work day'], format='%d-%m-%Y %I:%M %p').dt.strftime('%d-%a').str.upper()
     df.columns = df.columns.str.upper()
-    
     return df
 
+
     
 
-def run_backend(df):
+
+def run_backend(df): # MAIN DEF FOR ENTIRE BACKEND PROCES
 
     #####################################################################################
     # BCKEND PROCESSING - MAIN
@@ -162,7 +179,7 @@ def run_backend(df):
     dfr = pd.DataFrame()
     #df = pd.read_excel('attendance.xlsx')
     df.columns = 'id name date_time state'.split()
-    #df = df[df['name'] == 'Adnan Mohamed Abdul Hami']
+
 
     df['date_time'] = pd.to_datetime(df['date_time'], format='%m/%d/%Y %I:%M %p')  
     df = df.sort_values(by=df.columns.tolist())
@@ -206,11 +223,17 @@ def run_backend(df):
 import streamlit as st
 import base64  # To convert local background image into a format Streamlit can use
 
+
+
+
+
 def get_base64(bin_file):
     # To convert local background image into a format Streamlit can use
     with open(bin_file, 'rb') as f:
         data = f.read()
     return base64.b64encode(data).decode()
+
+
 
 
 def set_background_from_url():
@@ -250,14 +273,9 @@ def set_background_from_local_file(png_file):
 
     
 
-
-
-# Set page configuration
+# Set page configuration and title
 st.set_page_config(page_title='Attendance Calculator', page_icon='📊', layout='wide', initial_sidebar_state='expanded')
 set_background_from_local_file('background.jpg')    
-
-
-# Title
 st.title('Attendance Calculator Test')
 
 # File upload
@@ -287,6 +305,7 @@ if uploaded_file is not None:
     tab1, tab2, tab3 = st.tabs(['OUTPUT', 'GIVEN DATA', 'ABOUT'])    
 
     with tab1:
+        # Display DF
         st.markdown("""<h3 style='text-align: center; color: #FFFFFF;'>Output</h3>""", unsafe_allow_html=True)
         st.dataframe(df2, use_container_width=True, hide_index=True)  # Display output dataframe without index
 
@@ -342,7 +361,7 @@ if uploaded_file is not None:
             label="Download Sample Excel File For Testing The Application!",
             key="download_button",
             on_click=None,  # You can specify a callback function if needed
-            file_name="Sample.xlsx",
+            file_name="sample.xlsx",
             data=document,
             help="Click to download.",
         ):
