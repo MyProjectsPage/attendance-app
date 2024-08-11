@@ -248,7 +248,7 @@ def set_background_from_local_file(png_file):
 
 
 # Set page configuration
-st.set_page_config(page_title='Attendance Calculator', page_icon='📊', layout='wide', initial_sidebar_state='expanded')
+st.set_page_config(page_title='Attendance Calculator Test', page_icon='📊', layout='wide', initial_sidebar_state='expanded')
 set_background_from_local_file('background.jpg')    
 
 
