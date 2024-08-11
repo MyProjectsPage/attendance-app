@@ -13,9 +13,6 @@
 #import os
 #import subprocess
 
-import subprocess
-import sys
-subprocess.check_call([sys.executable, "-m", "pip", "install", "openpyxl"])
 
 import pandas as pd
 import time 
