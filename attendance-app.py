@@ -334,8 +334,8 @@ if uploaded_file is not None:
         st.markdown(text)
 
 
-        with open("Sample.xlsx", "rb") as pdf_file:
-            document = pdf_file.read()
+        with open("sample.xlsx", "rb") as xls_file:
+            document = xls_file.read()
 
         if st.download_button(
             label="Download Sample Excel File For Testing The Application!",
