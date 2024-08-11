@@ -83,7 +83,10 @@ def create_xl_file(df_or_dfs, output_file='Output.xlsx', open_file=False, sheet_
             
 
     # Save the workbook as an Excel file
-    wb.save(output_file)
+    try:
+        wb.save(output_file)
+    except:
+        pass
 
     # Save the workbook in memory for Streamlit download button
     output_file_stream = BytesIO()
