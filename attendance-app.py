@@ -12,6 +12,7 @@
 
 #import os
 #import subprocess
+
 import pandas as pd
 import time 
 #import win32com.client
@@ -30,7 +31,7 @@ def create_xl_file(df_or_dfs, output_file='Output.xlsx', open_file=False, sheet_
     from openpyxl.worksheet.table import Table, TableStyleInfo
     from io import BytesIO
     import os
-    import win32com.client
+    #import win32com.client
 
     # If df_or_dfs is not a list, convert it to a list with a single item
     if not isinstance(df_or_dfs, list):
@@ -248,12 +249,12 @@ def set_background_from_local_file(png_file):
 
 
 # Set page configuration
-st.set_page_config(page_title='Attendance Calculator Test', page_icon='📊', layout='wide', initial_sidebar_state='expanded')
+st.set_page_config(page_title='Attendance Calculator', page_icon='📊', layout='wide', initial_sidebar_state='expanded')
 set_background_from_local_file('background.jpg')    
 
 
 # Title
-st.title('Attendance Calculator')
+st.title('Attendance Calculator Test')
 
 # File upload
 uploaded_file = st.file_uploader("Upload your file", type=["csv", "xlsx"])
