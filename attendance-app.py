@@ -335,6 +335,7 @@ if uploaded_file is not None:
 
 
         with open("sample.xlsx", "rb") as xls_file:
+            # ALERT!! Make file name all in small letters to avoid errors during web deployment. It gives an error when using 'Sample.xlsx'
             document = xls_file.read()
 
         if st.download_button(
