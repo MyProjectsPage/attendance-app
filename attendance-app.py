@@ -282,6 +282,75 @@ st.title('Attendance Calculator')
 
 
 
+
+
+
+
+
+
+
+
+# File upload
+uploaded_file = st.file_uploader("Upload your file", type=["csv", "xlsx"])
+
+
+if uploaded_file is not None:
+    # Read file into dataframe
+    if uploaded_file.name.endswith('.csv'):
+        df1 = pd.read_csv(uploaded_file)
+    elif uploaded_file.name.endswith('.xlsx'):
+        df1 = pd.read_excel(uploaded_file)
+    
+    
+    # Dropdown with options for unique names
+    unique_names = ['ALL'] + sorted(df1['Name'].unique())
+    selected_name = st.selectbox("Filter by Name", unique_names)
+    
+    # Filter dataframe based on selected name
+    filtered_df1 = df1
+    if selected_name != 'ALL':  filtered_df1 = df1[df1['Name'] == selected_name]
+    
+    # Create a new dataframe with an extra column
+    df2 = filtered_df1.copy()
+    df2, df3, output_file_stream = run_backend(df2)
+    
+    # Create tabs
+    tab1, tab2 = st.tabs(['OUTPUT', 'GIVEN DATA'])    
+
+    with tab1:
+        # Display DF
+        st.markdown("""<h3 style='text-align: center; color: #FFFFFF;'>Output</h3>""", unsafe_allow_html=True)
+        st.dataframe(df2, use_container_width=True, hide_index=True)  # Display output dataframe without index
+
+
+        # Abnotmal Hours
+        st.markdown("""<BR><h3 style='text-align: center; color: #FFFFFF;'>Shifts With Abnormal Number of Hours</h3>""", unsafe_allow_html=True)
+        st.dataframe(df3, use_container_width=True, hide_index=True)  # Display output dataframe without index
+
+
+        # Bar Chart
+        st.markdown("""<BR><h3 style='text-align: center; color: #FFFFFF;'>Time Spent Per Shift</h3>""", unsafe_allow_html=True)
+        shift_hours = df2.groupby('WORK DAY')['HOURS'].sum().reset_index()
+        st.bar_chart(shift_hours.set_index('WORK DAY')['HOURS'], use_container_width=True)
+
+
+        # Add download button
+        st.download_button(
+            label="Download Excel Output File",
+            data=output_file_stream,
+            file_name='Output.xlsx',
+            mime="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
+            help="Click to download the Output.xlsx file"
+        )
+
+        
+    with tab2:
+        st.markdown("""<h3 style='text-align: center; color: #FFFFFF;'>Original Data</h3>""", unsafe_allow_html=True)
+        st.dataframe(filtered_df1, use_container_width=True, hide_index=True)  # Display filtered dataframe without index
+
+
+
+            
 with st.expander('Click Here To Open About Section & Download Sample File'):
     st.markdown("## About")
     st.markdown("Developer: Chadee Fouad - MyWorkDropBox@gmail.com  \nDevelopment Date: Aug 2024.")
@@ -317,72 +386,4 @@ with st.expander('Click Here To Open About Section & Download Sample File'):
         st.success(text)
 
 
-
-
-
-
-
-
-with st.expander('Click Here To Open The App Section'):
-
-    # File upload
-    uploaded_file = st.file_uploader("Upload your file", type=["csv", "xlsx"])
-
-    if uploaded_file is not None:
-        # Read file into dataframe
-        if uploaded_file.name.endswith('.csv'):
-            df1 = pd.read_csv(uploaded_file)
-        elif uploaded_file.name.endswith('.xlsx'):
-            df1 = pd.read_excel(uploaded_file)
-        
-        
-        # Dropdown with options for unique names
-        unique_names = ['ALL'] + sorted(df1['Name'].unique())
-        selected_name = st.selectbox("Filter by Name", unique_names)
-        
-        # Filter dataframe based on selected name
-        filtered_df1 = df1
-        if selected_name != 'ALL':  filtered_df1 = df1[df1['Name'] == selected_name]
-        
-        # Create a new dataframe with an extra column
-        df2 = filtered_df1.copy()
-        df2, df3, output_file_stream = run_backend(df2)
-        
-        # Create tabs
-        tab1, tab2 = st.tabs(['OUTPUT', 'GIVEN DATA'])    
-
-        with tab1:
-            # Display DF
-            st.markdown("""<h3 style='text-align: center; color: #FFFFFF;'>Output</h3>""", unsafe_allow_html=True)
-            st.dataframe(df2, use_container_width=True, hide_index=True)  # Display output dataframe without index
-
-
-            # Abnotmal Hours
-            st.markdown("""<BR><h3 style='text-align: center; color: #FFFFFF;'>Shifts With Abnormal Number of Hours</h3>""", unsafe_allow_html=True)
-            st.dataframe(df3, use_container_width=True, hide_index=True)  # Display output dataframe without index
-
-
-            # Bar Chart
-            st.markdown("""<BR><h3 style='text-align: center; color: #FFFFFF;'>Time Spent Per Shift</h3>""", unsafe_allow_html=True)
-            shift_hours = df2.groupby('WORK DAY')['HOURS'].sum().reset_index()
-            st.bar_chart(shift_hours.set_index('WORK DAY')['HOURS'], use_container_width=True)
-
-
-            # Add download button
-            st.download_button(
-                label="Download Excel Output File",
-                data=output_file_stream,
-                file_name='Output.xlsx',
-                mime="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
-                help="Click to download the Output.xlsx file"
-            )
-
-            
-        with tab2:
-            st.markdown("""<h3 style='text-align: center; color: #FFFFFF;'>Original Data</h3>""", unsafe_allow_html=True)
-            st.dataframe(filtered_df1, use_container_width=True, hide_index=True)  # Display filtered dataframe without index
-
-
-
-            
 
