@@ -279,17 +279,6 @@ set_background_from_local_file('background.jpg')
 st.title('Attendance Calculator')
 
 
-
-
-
-
-
-
-
-
-
-
-
 # File upload
 uploaded_file = st.file_uploader("Upload your file", type=["csv", "xlsx"])
 
@@ -351,7 +340,8 @@ if uploaded_file is not None:
 
 
             
-with st.expander('Click Here To Open About Section & Download Sample File'):
+
+with st.expander('Click Here To Open The [ABOUT] Section & To Download A Sample File For Trying The App!'):
     st.markdown("## About")
     st.markdown("Developer: Chadee Fouad - MyWorkDropBox@gmail.com  \nDevelopment Date: Aug 2024.")
     st.markdown("Credit for wallpaper image goes to: https://wallpapercave.com/")
