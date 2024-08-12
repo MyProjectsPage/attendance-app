@@ -341,7 +341,7 @@ if uploaded_file is not None:
 
             
 
-with st.expander('>>> Click Here To Open The [ABOUT] Section & To Download A Sample File For Trying The App! <<<'):
+with st.expander('Click Here To Open The [ABOUT] Section & To Download A Sample File For Trying The App!'):
     st.markdown("## About")
     st.markdown("Developer: Chadee Fouad - MyWorkDropBox@gmail.com  \nDevelopment Date: Aug 2024.")
     st.markdown("Credit for wallpaper image goes to: https://wallpapercave.com/")
