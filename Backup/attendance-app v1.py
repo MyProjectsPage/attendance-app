@@ -278,98 +278,95 @@ st.set_page_config(page_title='Attendance Calculator', page_icon='📊', layout=
 set_background_from_local_file('background.jpg')    
 st.title('Attendance Calculator')
 
+# File upload
+uploaded_file = st.file_uploader("Upload your file", type=["csv", "xlsx"])
 
-with st.expander("Click Down Arrow To Open App:"):
+if uploaded_file is not None:
+    # Read file into dataframe
+    if uploaded_file.name.endswith('.csv'):
+        df1 = pd.read_csv(uploaded_file)
+    elif uploaded_file.name.endswith('.xlsx'):
+        df1 = pd.read_excel(uploaded_file)
+    
+    
+    # Dropdown with options for unique names
+    unique_names = ['ALL'] + sorted(df1['Name'].unique())
+    selected_name = st.selectbox("Filter by Name", unique_names)
+    
+    # Filter dataframe based on selected name
+    filtered_df1 = df1
+    if selected_name != 'ALL':  filtered_df1 = df1[df1['Name'] == selected_name]
+    
+    # Create a new dataframe with an extra column
+    df2 = filtered_df1.copy()
+    df2, df3, output_file_stream = run_backend(df2)
+    
+    # Create tabs
+    tab1, tab2, tab3 = st.tabs(['OUTPUT', 'GIVEN DATA', 'ABOUT'])    
 
-    # File upload
-    uploaded_file = st.file_uploader("Upload your file", type=["csv", "xlsx"])
+    with tab1:
+        # Display DF
+        st.markdown("""<h3 style='text-align: center; color: #FFFFFF;'>Output</h3>""", unsafe_allow_html=True)
+        st.dataframe(df2, use_container_width=True, hide_index=True)  # Display output dataframe without index
 
-    if uploaded_file is not None:
-        # Read file into dataframe
-        if uploaded_file.name.endswith('.csv'):
-            df1 = pd.read_csv(uploaded_file)
-        elif uploaded_file.name.endswith('.xlsx'):
-            df1 = pd.read_excel(uploaded_file)
+
+        # Abnotmal Hours
+        st.markdown("""<BR><h3 style='text-align: center; color: #FFFFFF;'>Shifts With Abnormal Number of Hours</h3>""", unsafe_allow_html=True)
+        st.dataframe(df3, use_container_width=True, hide_index=True)  # Display output dataframe without index
+
+
+        # Bar Chart
+        st.markdown("""<BR><h3 style='text-align: center; color: #FFFFFF;'>Time Spent Per Shift</h3>""", unsafe_allow_html=True)
+        shift_hours = df2.groupby('WORK DAY')['HOURS'].sum().reset_index()
+        st.bar_chart(shift_hours.set_index('WORK DAY')['HOURS'], use_container_width=True)
+
+
+        # Add download button
+        st.download_button(
+            label="Download Excel Output File",
+            data=output_file_stream,
+            file_name='Output.xlsx',
+            mime="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
+            help="Click to download the Output.xlsx file"
+        )
+
         
-        
-        # Dropdown with options for unique names
-        unique_names = ['ALL'] + sorted(df1['Name'].unique())
-        selected_name = st.selectbox("Filter by Name", unique_names)
-        
-        # Filter dataframe based on selected name
-        filtered_df1 = df1
-        if selected_name != 'ALL':  filtered_df1 = df1[df1['Name'] == selected_name]
-        
-        # Create a new dataframe with an extra column
-        df2 = filtered_df1.copy()
-        df2, df3, output_file_stream = run_backend(df2)
-        
-        # Create tabs
-        tab1, tab2, tab3 = st.tabs(['OUTPUT', 'GIVEN DATA', 'ABOUT'])    
-
-        with tab1:
-            # Display DF
-            st.markdown("""<h3 style='text-align: center; color: #FFFFFF;'>Output</h3>""", unsafe_allow_html=True)
-            st.dataframe(df2, use_container_width=True, hide_index=True)  # Display output dataframe without index
+    with tab2:
+        st.markdown("""<h3 style='text-align: center; color: #FFFFFF;'>Original Data</h3>""", unsafe_allow_html=True)
+        st.dataframe(filtered_df1, use_container_width=True, hide_index=True)  # Display filtered dataframe without index
 
 
-            # Abnotmal Hours
-            st.markdown("""<BR><h3 style='text-align: center; color: #FFFFFF;'>Shifts With Abnormal Number of Hours</h3>""", unsafe_allow_html=True)
-            st.dataframe(df3, use_container_width=True, hide_index=True)  # Display output dataframe without index
+    with tab3:
+        st.markdown("## About")
+        st.markdown("Developer: Chadee Fouad - MyWorkDropBox@gmail.com  \nDevelopment Date: Aug 2024.")
+        st.markdown("Credit for wallpaper image goes to: https://wallpapercave.com/")
+
+        st.write("")
+        text = 'The purpose of this application is to help payroll accountants at a factory to calculate the attendance for workers.'
+        text = text + '  \nCurrently there are many issues which makes the process quite complicated and requires a lot of manual adjustments.'
+        text = text + '  \nThe reason for this is that the current attendance scanner is very basic.'
+        text = text + "  \nAs such anyone can 'check-in' or 'check-out' many times. For example an employee can check in at 9:00 AM then go get something from his car then check in again at 9:03 AM."
+        text = text + "  \nOften there are people that are worried that the scanner did not scan correctly so they check-in or check-out many times when the scanner already scanned correctly."
+        text = text + "  \nSometimes people forget to check-in or check-out so the in/outs do not correctly align."
+        text = text + "  \nThis is where the application helps. It gives tries to align those entries as much as possible."
+        text = text + "  \nIt also highlights shifts with an abnormal number of hours (possible check-in/out errors) which makes it much easier for the accountants."
+        st.markdown(text)
 
 
-            # Bar Chart
-            st.markdown("""<BR><h3 style='text-align: center; color: #FFFFFF;'>Time Spent Per Shift</h3>""", unsafe_allow_html=True)
-            shift_hours = df2.groupby('WORK DAY')['HOURS'].sum().reset_index()
-            st.bar_chart(shift_hours.set_index('WORK DAY')['HOURS'], use_container_width=True)
+        with open("sample.xlsx", "rb") as xls_file:
+            # ALERT!! Make file name all in small letters to avoid errors during web deployment. It gives an error when using 'Sample.xlsx'
+            document = xls_file.read()
 
-
-            # Add download button
-            st.download_button(
-                label="Download Excel Output File",
-                data=output_file_stream,
-                file_name='Output.xlsx',
-                mime="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
-                help="Click to download the Output.xlsx file"
-            )
-
-            
-        with tab2:
-            st.markdown("""<h3 style='text-align: center; color: #FFFFFF;'>Original Data</h3>""", unsafe_allow_html=True)
-            st.dataframe(filtered_df1, use_container_width=True, hide_index=True)  # Display filtered dataframe without index
-
-
-        with tab3:
-            st.markdown("## About")
-            st.markdown("Developer: Chadee Fouad - MyWorkDropBox@gmail.com  \nDevelopment Date: Aug 2024.")
-            st.markdown("Credit for wallpaper image goes to: https://wallpapercave.com/")
-
-            st.write("")
-            text = 'The purpose of this application is to help payroll accountants at a factory to calculate the attendance for workers.'
-            text = text + '  \nCurrently there are many issues which makes the process quite complicated and requires a lot of manual adjustments.'
-            text = text + '  \nThe reason for this is that the current attendance scanner is very basic.'
-            text = text + "  \nAs such anyone can 'check-in' or 'check-out' many times. For example an employee can check in at 9:00 AM then go get something from his car then check in again at 9:03 AM."
-            text = text + "  \nOften there are people that are worried that the scanner did not scan correctly so they check-in or check-out many times when the scanner already scanned correctly."
-            text = text + "  \nSometimes people forget to check-in or check-out so the in/outs do not correctly align."
-            text = text + "  \nThis is where the application helps. It gives tries to align those entries as much as possible."
-            text = text + "  \nIt also highlights shifts with an abnormal number of hours (possible check-in/out errors) which makes it much easier for the accountants."
-            st.markdown(text)
-
-
-            with open("sample.xlsx", "rb") as xls_file:
-                # ALERT!! Make file name all in small letters to avoid errors during web deployment. It gives an error when using 'Sample.xlsx'
-                document = xls_file.read()
-
-            if st.download_button(
-                label="Download Sample Excel File For Testing The Application!",
-                key="download_button",
-                on_click=None,  # You can specify a callback function if needed
-                file_name="sample.xlsx",
-                data=document,
-                help="Click to download.",
-            ):
-                # Show success message after clicking download
-                text = 'Great! Now locate the downloaded file and drag it to the [Drag And Drop File Here] area at the top of the page.'
-                text = text + '  \nThen click on the "OUTPUT" tab to see the demo results.'
-                st.success(text)
+        if st.download_button(
+            label="Download Sample Excel File For Testing The Application!",
+            key="download_button",
+            on_click=None,  # You can specify a callback function if needed
+            file_name="sample.xlsx",
+            data=document,
+            help="Click to download.",
+        ):
+            # Show success message after clicking download
+            text = 'Great! Now locate the downloaded file and drag it to the [Drag And Drop File Here] area at the top of the page.'
+            text = text + '  \nThen click on the "OUTPUT" tab to see the demo results.'
+            st.success(text)
 
