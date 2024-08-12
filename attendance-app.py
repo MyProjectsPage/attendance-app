@@ -279,7 +279,51 @@ set_background_from_local_file('background.jpg')
 st.title('Attendance Calculator')
 
 
-with st.expander("Click Down Arrow To Open App:"):
+
+
+
+with st.expander('Click Here To Open About Section & Download Sample File'):
+    st.markdown("## About")
+    st.markdown("Developer: Chadee Fouad - MyWorkDropBox@gmail.com  \nDevelopment Date: Aug 2024.")
+    st.markdown("Credit for wallpaper image goes to: https://wallpapercave.com/")
+
+    st.write("")
+    text = 'The purpose of this application is to help payroll accountants at a factory to calculate the attendance for workers.'
+    text = text + '  \nCurrently there are many issues which makes the process quite complicated and requires a lot of manual adjustments.'
+    text = text + '  \nThe reason for this is that the current attendance scanner is very basic.'
+    text = text + "  \nAs such anyone can 'check-in' or 'check-out' many times. For example an employee can check in at 9:00 AM then go get something from his car then check in again at 9:03 AM."
+    text = text + "  \nOften there are people that are worried that the scanner did not scan correctly so they check-in or check-out many times when the scanner already scanned correctly."
+    text = text + "  \nSometimes people forget to check-in or check-out so the in/outs do not correctly align."
+    text = text + "  \nThis is where the application helps. It gives tries to align those entries as much as possible."
+    text = text + "  \nIt also highlights shifts with an abnormal number of hours (possible check-in/out errors) which makes it much easier for the accountants."
+    st.markdown(text)
+
+
+    with open("sample.xlsx", "rb") as xls_file:
+        # ALERT!! Make file name all in small letters to avoid errors during web deployment. It gives an error when using 'Sample.xlsx'
+        document = xls_file.read()
+
+    if st.download_button(
+        label="Download Sample Excel File For Testing The Application!",
+        key="download_button",
+        on_click=None,  # You can specify a callback function if needed
+        file_name="sample.xlsx",
+        data=document,
+        help="Click to download.",
+    ):
+        # Show success message after clicking download
+        text = 'Great! Now locate the downloaded file and drag it to the [Drag And Drop File Here] area at the top of the page.'
+        text = text + '  \nThen click on the "OUTPUT" tab to see the demo results.'
+        st.success(text)
+
+
+
+
+
+
+
+
+with st.expander('Click Here To Open The App Section'):
 
     # File upload
     uploaded_file = st.file_uploader("Upload your file", type=["csv", "xlsx"])
@@ -305,7 +349,7 @@ with st.expander("Click Down Arrow To Open App:"):
         df2, df3, output_file_stream = run_backend(df2)
         
         # Create tabs
-        tab1, tab2, tab3 = st.tabs(['OUTPUT', 'GIVEN DATA', 'ABOUT'])    
+        tab1, tab2 = st.tabs(['OUTPUT', 'GIVEN DATA'])    
 
         with tab1:
             # Display DF
@@ -339,37 +383,6 @@ with st.expander("Click Down Arrow To Open App:"):
             st.dataframe(filtered_df1, use_container_width=True, hide_index=True)  # Display filtered dataframe without index
 
 
-        with tab3:
-            st.markdown("## About")
-            st.markdown("Developer: Chadee Fouad - MyWorkDropBox@gmail.com  \nDevelopment Date: Aug 2024.")
-            st.markdown("Credit for wallpaper image goes to: https://wallpapercave.com/")
 
-            st.write("")
-            text = 'The purpose of this application is to help payroll accountants at a factory to calculate the attendance for workers.'
-            text = text + '  \nCurrently there are many issues which makes the process quite complicated and requires a lot of manual adjustments.'
-            text = text + '  \nThe reason for this is that the current attendance scanner is very basic.'
-            text = text + "  \nAs such anyone can 'check-in' or 'check-out' many times. For example an employee can check in at 9:00 AM then go get something from his car then check in again at 9:03 AM."
-            text = text + "  \nOften there are people that are worried that the scanner did not scan correctly so they check-in or check-out many times when the scanner already scanned correctly."
-            text = text + "  \nSometimes people forget to check-in or check-out so the in/outs do not correctly align."
-            text = text + "  \nThis is where the application helps. It gives tries to align those entries as much as possible."
-            text = text + "  \nIt also highlights shifts with an abnormal number of hours (possible check-in/out errors) which makes it much easier for the accountants."
-            st.markdown(text)
-
-
-            with open("sample.xlsx", "rb") as xls_file:
-                # ALERT!! Make file name all in small letters to avoid errors during web deployment. It gives an error when using 'Sample.xlsx'
-                document = xls_file.read()
-
-            if st.download_button(
-                label="Download Sample Excel File For Testing The Application!",
-                key="download_button",
-                on_click=None,  # You can specify a callback function if needed
-                file_name="sample.xlsx",
-                data=document,
-                help="Click to download.",
-            ):
-                # Show success message after clicking download
-                text = 'Great! Now locate the downloaded file and drag it to the [Drag And Drop File Here] area at the top of the page.'
-                text = text + '  \nThen click on the "OUTPUT" tab to see the demo results.'
-                st.success(text)
+            
 
